@@ -34,22 +34,35 @@
 
   function tw(cm) { return Math.round(cm * CM); }
 
+  var THAI_SPLIT = /([฀-๿]+)/;
+  var THAI = /^[฀-๿]/;
+
   // text อาจมี \t (กระโดดไป tab stop) และ \n (ขึ้นบรรทัดใหม่ในย่อหน้าเดิม)
+  // ข้อความไทยแยกเป็น run ของตัวเองและติด <w:cs/> (complex script)
+  // ถ้าไม่ติด Word จะไม่ใช้พจนานุกรมตัดคำไทย และตัดบรรทัดกลางคำ
+  // (ทดสอบแล้ว: ตั้ง w:lang เป็น th-TH อย่างเดียวไม่พอ)
   function run(text, o) {
     o = o || {};
-    var rPr = '';                                       // ลำดับตาม schema: b, sz, u
-    if (o.b) rPr += '<w:b/><w:bCs/>';
-    if (o.size) rPr += '<w:sz w:val="' + o.size * 2 + '"/><w:szCs w:val="' + o.size * 2 + '"/>';
-    if (o.u) rPr += '<w:u w:val="single"/>';
-    var body = '';
+    var base = '';                                      // ลำดับตาม schema: b, sz, u, cs
+    if (o.b) base += '<w:b/><w:bCs/>';
+    if (o.size) base += '<w:sz w:val="' + o.size * 2 + '"/><w:szCs w:val="' + o.size * 2 + '"/>';
+    if (o.u) base += '<w:u w:val="single"/>';
+    var out = '';
+    function emit(rPr, body) {
+      out += '<w:r>' + (rPr ? '<w:rPr>' + rPr + '</w:rPr>' : '') + body + '</w:r>';
+    }
     String(text).split('\n').forEach(function (line, i) {
-      if (i > 0) body += '<w:br/>';
+      if (i > 0) emit(base, '<w:br/>');
       line.split('\t').forEach(function (part, j) {
-        if (j > 0) body += '<w:tab/>';
-        if (part) body += '<w:t xml:space="preserve">' + esc(part) + '</w:t>';
+        if (j > 0) emit(base, '<w:tab/>');
+        part.split(THAI_SPLIT).forEach(function (seg) {
+          if (!seg) return;
+          emit(THAI.test(seg) ? base + '<w:cs/>' : base,
+            '<w:t xml:space="preserve">' + esc(seg) + '</w:t>');
+        });
       });
     });
-    return '<w:r>' + (rPr ? '<w:rPr>' + rPr + '</w:rPr>' : '') + body + '</w:r>';
+    return out;
   }
 
   function para(runs, o) {
