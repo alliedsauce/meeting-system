@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระยะ 0 ทดสอบพื้นฐาน — ระบบประชุมสำนักวิชาการ</title>
+  <style>
+    :root { --ok: #0a7d32; --bad: #b3261e; --warn: #8a5a00; --muted: #5f6368; --line: #dadce0; }
+    * { box-sizing: border-box; }
+    body { font-family: "Leelawadee UI", Tahoma, sans-serif; margin: 0; padding: 24px; max-width: 920px; margin-inline: auto; color: #202124; line-height: 1.6; }
+    h1 { font-size: 22px; margin: 0 0 4px; }
+    h2 { font-size: 17px; margin: 0 0 8px; }
+    p.sub { color: var(--muted); margin: 0 0 16px; }
+    section { border: 1px solid var(--line); border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    pre#env { background: #f6f8fa; padding: 10px 12px; border-radius: 6px; margin: 0; white-space: pre-wrap; font-size: 13px; }
+    .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0; }
+    button { font: inherit; padding: 6px 14px; border-radius: 6px; border: 1px solid #1a73e8; background: #1a73e8; color: #fff; cursor: pointer; }
+    button.secondary { background: #fff; color: #1a73e8; }
+    button:disabled { opacity: .45; cursor: not-allowed; }
+    .label { color: var(--muted); }
+    code { background: #f1f3f4; padding: 1px 5px; border-radius: 4px; }
+    ol#log { padding-left: 0; list-style: none; margin: 0; max-height: 360px; overflow: auto; font-size: 14px; }
+    ol#log li { padding: 4px 0; border-bottom: 1px dashed var(--line); }
+    ol#log li.fail { color: var(--bad); }
+    ol#log li.pass { color: var(--ok); }
+    ol#log li.warn { color: var(--warn); }
+  </style>
+</head>
+<body>
+  <h1>ระยะ 0 ทดสอบพื้นฐาน</h1>
+  <p class="sub">เปิดโฟลเดอร์ข้อมูลที่ sync จาก Teams/SharePoint และสร้าง Word ภาษาไทย 1 หน้า ทำตามขั้นตอนใน <code>docs/phase0-checklist.md</code></p>
+
+  <section>
+    <h2>สภาพแวดล้อม</h2>
+    <pre id="env">กำลังตรวจ…</pre>
+  </section>
+
+  <section>
+    <h2>1. โฟลเดอร์ข้อมูล</h2>
+    <div class="row"><span class="label">โฟลเดอร์ที่ใช้อยู่:</span> <strong id="dir-name">(ยังไม่ได้เลือก)</strong></div>
+    <div class="row"><span class="label">โฟลเดอร์ที่หน้านี้จำไว้:</span> <span id="stored">…</span></div>
+    <div class="row">
+      <button id="pick">1.1 เลือกโฟลเดอร์ข้อมูล</button>
+      <button id="reconnect" hidden>1.3 เชื่อมต่อโฟลเดอร์เดิม</button>
+      <button id="forget" class="secondary">ล้างโฟลเดอร์ที่จำไว้</button>
+    </div>
+    <div class="row">
+      <button id="write-read" data-needs-dir disabled>1.2 เขียนและอ่าน test.json</button>
+      <button id="read-only" data-needs-dir disabled>1.3 อ่าน test.json อย่างเดียว</button>
+    </div>
+    <div class="row">
+      <button id="scan" data-needs-dir disabled>1.4 ตรวจไฟล์ค้าง/ไฟล์ชนกัน</button>
+      <button id="change-check" data-needs-dir disabled>1.4 ตรวจว่าไฟล์ถูกแก้จากที่อื่น</button>
+    </div>
+    <div class="row">
+      <button id="structure" data-needs-dir disabled>1.5 สร้างโครงสร้างจริง สภาวิชาการ\2569-05\เอกสารแนบ\4.1.1.pdf</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>2. Word หัวรายงานการประชุม</h2>
+    <p class="sub">ฟอนต์ <strong id="font-name"></strong> 16pt กระดาษ A4 ข้อมูลในไฟล์เป็นชื่อสมมติทั้งหมด</p>
+    <div class="row">
+      <label><input type="checkbox" id="thai-test" checked> ใส่บรรทัดทดสอบอักขระไทยท้ายหน้า</label>
+    </div>
+    <div class="row">
+      <button id="docx-download">2.1 สร้าง Word แล้วดาวน์โหลด</button>
+      <button id="docx-save" data-needs-dir disabled>2.2 สร้าง Word แล้วบันทึกลงโฟลเดอร์ข้อมูล</button>
+    </div>
+  </section>
+
+  <section>
+    <h2>ผลการทดสอบ</h2>
+    <div class="row"><button id="copy" class="secondary">คัดลอกผลทั้งหมด</button></div>
+    <ol id="log"></ol>
+  </section>
+
+  <!-- script ธรรมดา ไม่ใช้ type="module" เพื่อให้เปิดจาก file:// ได้ -->
+  <script src="zip.js"></script>
+  <script src="docx.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
